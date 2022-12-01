@@ -77,8 +77,10 @@ public class RestProducerRoute extends RouteBuilder {
                 .setHeader(Exchange.HTTP_URI, simple(restProducerConfig.getProtocol()+"://"
                         +restProducerConfig.getHost()+restProducerConfig.getContext()))
                 .setHeader(Exchange.HTTP_QUERY, simple("vocab=ysa&query=kiss*&lang=fi"))
+                .setBody(constant("Hello Baeldung Readers!"))
                 .to("http://call")
                 .convertBodyTo(String.class)
+                .to("direct:logResponseMS")
                 .end();
 
     }
