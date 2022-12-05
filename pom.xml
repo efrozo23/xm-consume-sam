@@ -5,7 +5,7 @@
 	<artifactId>consume-sam</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Integracion XM-SAM</name>
-	<description>Spring boot running a camel 3 route</description>
+	<description>Service than Spring boot running a camel 3 route</description>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
