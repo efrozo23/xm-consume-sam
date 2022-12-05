@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import com.xm.base.config.RestProducerConfig;
+import com.xm.base.constant.Constant;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -73,11 +74,14 @@ public class RestProducerRoute extends RouteBuilder {
                 .routeId("call-external-ws")
                 .removeHeaders("CamelHttp*")
                 .setHeader(Exchange.HTTP_METHOD, simple(restProducerConfig.getMethod()))
-                .setHeader(Exchange.CONTENT_TYPE, constant(MediaType.APPLICATION_JSON))
+                .setHeader(Exchange.CONTENT_TYPE, constant(MediaType.TEXT_XML_VALUE))
                 .setHeader(Exchange.HTTP_URI, simple(restProducerConfig.getProtocol()+"://"
                         +restProducerConfig.getHost()+restProducerConfig.getContext()))
-                .setHeader(Exchange.HTTP_QUERY, simple("vocab=ysa&query=kiss*&lang=fi"))
-                .setBody(constant("Hello Baeldung Readers!"))
+                .setHeader(Constant.OPERATION_NAME, simple("{{rest.produces.operationname}}"))
+                .setHeader(Constant.OPERATION_NAME, simple("{{rest.produces.fileid}}"))
+                .setHeader(Constant.OPERATION_NAME, simple("{{rest.produces.varname}}"))
+                .to("velocity:templates/request.vm?loaderCache=false")
+                .to("direct:logRequestExternalService")
                 .to("http://call")
                 .convertBodyTo(String.class)
                 .to("direct:logResponseMS")

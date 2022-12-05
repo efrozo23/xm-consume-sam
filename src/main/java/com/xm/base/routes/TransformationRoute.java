@@ -1,6 +1,8 @@
 package com.xm.base.routes;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.xm.base.constant.Constant;
+
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.stereotype.Component;
@@ -32,8 +34,8 @@ public class TransformationRoute extends RouteBuilder {
                                 .setBody(simple("${exception.message}"))
                                 .end();
 
-                from("direct:getUsers")
-                                .routeId("get-user-route")
+                from(Constant.ROUTE_INIT)
+                                .routeId("ROUTE_INIT")
                                 .to("direct:logRequestMS")
                                 .to("direct:call-external-ws")
                                 .to("direct:logResponseMS")
