@@ -17,6 +17,8 @@ import org.mockserver.model.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.base.xm.dto.RequestFile;
+
 @SpringBootTest
 @CamelSpringBootTest
 
@@ -35,11 +37,13 @@ public class RestProducerRouteTest {
     
     @Test
     void whenSendBody_thenGreetingReceivedSuccessfully() throws Exception {
+    	RequestFile body = new RequestFile();
+    	body.file =  "ok";
     	URI pathFileResponse = this.getClass().getResource("/response/response.xml").toURI();
 		byte[] bodyResponse = Files.readAllBytes(new File(pathFileResponse).toPath());
     	mockServer.when(HttpRequest.request().withPath("/rest/v1/search"))
 		.respond(HttpResponse.response(new String(bodyResponse)).withStatusCode(200));
-    	final String ret = template.requestBodyAndHeader("direct:call-external-ws", "ok", "id", "1", String.class);
+    	final String ret = template.requestBodyAndHeader("direct:call-external-ws","{ 	\"file\": \"ok\" }", "id", "1", String.class);
         assertEquals(new String(bodyResponse), ret);
     }
     

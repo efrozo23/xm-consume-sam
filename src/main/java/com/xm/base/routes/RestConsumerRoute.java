@@ -5,8 +5,8 @@ import org.apache.camel.model.rest.RestBindingMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.base.xm.dto.RequestFile;
 import com.xm.base.config.RestConsumerConfig;
-import com.xm.base.config.RestProducerConfig;
 import com.xm.base.constant.Constant;
 
 /**
@@ -30,7 +30,8 @@ public class RestConsumerRoute extends RouteBuilder {
                 .clientRequestValidation(true);
 
         rest(restConfig.getApiPath())
-                .get()
+                .post()
+                .type(RequestFile.class)
                 .to(Constant.ROUTE_INIT);
 
     }
