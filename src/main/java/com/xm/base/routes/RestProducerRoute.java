@@ -1,22 +1,19 @@
 package com.xm.base.routes;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.http.base.HttpOperationFailedException;
-import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import com.base.xm.dto.RequestFile;
 import com.xm.base.config.RestProducerConfig;
 import com.xm.base.constant.Constant;
-
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 
 @Component
 public class RestProducerRoute extends RouteBuilder {
@@ -35,6 +32,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .log(LoggingLevel.ERROR, "${headers.stackHeader};StackTrace: ${exception.stacktrace}")
                 .setBody(simple("Error de Comunicacion "))
                 .setHeader("CamelHttpResponseCode", simple("500"))
+                .wireTap("direct:send-amq-exception")
                 .end();
 
         onException(SocketTimeoutException.class )
@@ -44,6 +42,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .log(LoggingLevel.ERROR, "${headers.stackHeader};StackTrace: ${exception.stacktrace}")
                 .setBody(simple("Error de Comunicacion "))
                 .setHeader("CamelHttpResponseCode", simple("500"))
+                .wireTap("direct:send-amq-exception")
                 .end();
 
         onException(HttpOperationFailedException.class)
@@ -53,6 +52,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .log(LoggingLevel.ERROR, "${headers.stackHeader};StackTrace: ${exception.stacktrace}")
                 .setBody(simple("${exception.responseBody}"))
                 .setHeader("CamelHttpResponseCode", simple("${exception.statusCode}"))
+                .wireTap("direct:send-amq-exception")
                 .end();
 
         onException(UnknownHostException.class)
@@ -62,6 +62,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .log(LoggingLevel.ERROR, "${headers.stackHeader};StackTrace: ${exception.stacktrace}")
                 .setBody(simple("Host no reconocido"))
                 .setHeader("CamelHttpResponseCode", simple("500"))
+                .wireTap("direct:send-amq-exception")
                 .end();
 
         onException(Exception.class)
@@ -71,6 +72,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .log(LoggingLevel.ERROR, "${headers.stackHeader};StackTrace: ${exception.stacktrace}")
                 .setBody(simple("Error Inesperado"))
                 .setHeader("CamelHttpResponseCode", simple("500"))
+                .wireTap("direct:send-amq-exception")
                 .end();
 
         from("direct:call-external-ws")

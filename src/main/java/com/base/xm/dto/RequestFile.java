@@ -4,5 +4,14 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName("")
 public class RequestFile {
-	public transient String file;
+	private String payload;
+
+	public String getPayload() {
+		return payload;
+	}
+
+	public void setPayload(String payload) {
+		this.payload = payload;
+	}
+
 }

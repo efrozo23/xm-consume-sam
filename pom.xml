@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.xm</groupId>
-	<artifactId>consume-sam</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>ms-consume-sam</artifactId>
+	<version>1.0.0</version>
 	<name>Integracion XM-SAM</name>
 	<description>Service than Spring boot running a camel 3 route</description>
 	<parent>
@@ -52,6 +52,18 @@
 		<dependency>
 			<groupId>co.com.xm</groupId>
 			<artifactId>lib-log-rest-appender</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>co.com.xm</groupId>
+			<artifactId>lib-process-exception</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>co.com.xm</groupId>
+			<artifactId>lib-config-amq</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 

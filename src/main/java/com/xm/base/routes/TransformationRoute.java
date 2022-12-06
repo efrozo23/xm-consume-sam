@@ -1,14 +1,18 @@
 package com.xm.base.routes;
 
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import org.springframework.stereotype.Component;
+
+import com.base.xm.dto.RequestFile;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.xm.base.constant.Constant;
 
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.builder.RouteBuilder;
-import org.springframework.stereotype.Component;
-
 @Component
 public class TransformationRoute extends RouteBuilder {
+	
+
 
         @Override
         public void configure() throws Exception {
@@ -22,6 +26,7 @@ public class TransformationRoute extends RouteBuilder {
                                 .log(LoggingLevel.ERROR, "StackTrace: ${exception.stacktrace}")
                                 .setBody(simple("${exception.message}"))
                                 .setHeader("CamelHttpResponseCode", simple("400"))
+                                .wireTap("direct:send-amq-exception")
                                 .end();
 
                 onException(Exception.class)
@@ -32,14 +37,38 @@ public class TransformationRoute extends RouteBuilder {
                                 .log(LoggingLevel.ERROR, "${headers.stackHeader};StackTrace: ${exception.stacktrace}")
                                 .setHeader("CamelHttpResponseCode", simple("500"))
                                 .setBody(simple("${exception.message}"))
+                                .wireTap("direct:send-amq-exception")
                                 .end();
 
                 from(Constant.ROUTE_INIT)
                                 .routeId("ROUTE_INIT")
+                                .streamCaching()
                                 .to("direct:logRequestMS")
+                                .unmarshal().json(JsonLibrary.Jackson, RequestFile.class)
+                                .setBody(simple("${body.payload}"))
+                                .convertBodyTo(String.class)
                                 .to("direct:call-external-ws")
                                 .to("direct:logResponseMS")
+                                .to(Constant.ROUTE_VALIDATE_RESPONSE)
                                 .end();
+                
+                from(Constant.ROUTE_VALIDATE_RESPONSE)
+		                .routeId("ROUTE_VALIDATE_RESPONSE")
+		                .streamCaching()
+		                .setProperty("SAMResponseXML").xpath("//result/text()")
+		                .choice()
+		                	.when(simple("${exchangeProperty.SAMResponseXML} == 'ERROR' "))
+		                		.setHeader(Constant.CAUSE_ERROR).xpath("//description/text()")
+		                		.throwException(Exception.class,"${header.cause}")
+		                	.endChoice()
+		                	.when(simple("${exchangeProperty.SAMResponseXML} == 'OK' "))
+		                		.setBody(constant("ok"))
+	                		.endChoice()
+	                		.otherwise()
+	                			.throwException(Exception.class,"Excepcion en el envìo del XML a SAM")
+	                		.endChoice()
+		                .end()
+		                .end();
 
         }
 }
