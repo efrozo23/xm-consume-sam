@@ -82,9 +82,9 @@ public class RestProducerRoute extends RouteBuilder {
                 .setHeader(Exchange.CONTENT_TYPE, constant(MediaType.TEXT_XML_VALUE))
                 .setHeader(Exchange.HTTP_URI, simple(restProducerConfig.getProtocol()+"://"
                         +restProducerConfig.getHost()+restProducerConfig.getContext()))
-                .setHeader(Constant.OPERATION_NAME, simple("{{rest.produces.operationname}}"))
-                .setHeader(Constant.OPERATION_NAME, simple("{{rest.produces.fileid}}"))
-                .setHeader(Constant.OPERATION_NAME, simple("{{rest.produces.varname}}"))
+                .setHeader(Constant.OPERATION_NAME, simple("${header.operationname}"))
+                .setHeader(Constant.OPERATION_NAME, simple("${header.fileid}"))
+                .setHeader(Constant.OPERATION_NAME, simple("${header.varname}"))
                 .to("velocity:templates/request.vm?loaderCache=false")
                 .to("direct:logRequestExternalService")
                 .to("http://call")
