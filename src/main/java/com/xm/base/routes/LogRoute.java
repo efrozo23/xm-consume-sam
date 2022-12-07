@@ -18,9 +18,11 @@ public class LogRoute extends RouteBuilder {
                 .log(LoggingLevel.INFO, " Response MS  ${body}");
 
         from("direct:logRequestExternalService")
+        		.log("estado=SENDING_TO_SAM | variable=${exchangeProperty.variable} | fecha_proceso= ${exchangeProperty.fecha} | fileId=${exchangeProperty.FILE_ID} | message=Sending To SAM ")
                 .log("Request External Service -->> ${body}");
 
         from("direct:logResponseExternalService")
+        		.log("estado=RESPONSE_SAM_CXF | variable=${exchangeProperty.variable} | fecha_proceso= ${exchangeProperty.fecha} | fileId=${exchangeProperty.FILE_ID} | message=Response SAM CamelCxfMessage: ${headers.CamelHttpResponseCode}")
                 .log("Response External Service <<-- ${body} ");
 
     }

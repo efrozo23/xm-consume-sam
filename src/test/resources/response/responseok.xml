@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:submitSAMSettlementDataInputResponse xmlns:ns2="http://soa.sam.xm.com/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+   <return>
+      <creationTime>2022-12-05T11:44:11.339Z</creationTime>
+      <description>Successful submission.</description>
+      <id>001</id>
+      <result>OK</result>
+   </return>
+</ns2:submitSAMSettlementDataInputResponse>

@@ -6,6 +6,7 @@ import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.stereotype.Component;
 
 import com.base.xm.dto.RequestFile;
+import com.base.xm.process.BuildResponse;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.xm.base.constant.Constant;
 
@@ -44,12 +45,15 @@ public class TransformationRoute extends RouteBuilder {
                                 .routeId("ROUTE_INIT")
                                 .streamCaching()
                                 .to("direct:logRequestMS")
+                                .setProperty("variable", header("varname"))
+                                .setProperty("fecha", simple("${date:now:yyyy-MM-dd}"))
+                                .setProperty(Constant.FILE_ID, header("id_file"))
                                 .unmarshal().json(JsonLibrary.Jackson, RequestFile.class)
                                 .setBody(simple("${body.payload}"))
                                 .convertBodyTo(String.class)
                                 .to("direct:call-external-ws")
-                                .to("direct:logResponseMS")
                                 .to(Constant.ROUTE_VALIDATE_RESPONSE)
+                                .to("direct:logResponseMS")
                                 .end();
                 
                 from(Constant.ROUTE_VALIDATE_RESPONSE)
@@ -59,10 +63,11 @@ public class TransformationRoute extends RouteBuilder {
 		                .choice()
 		                	.when(simple("${exchangeProperty.SAMResponseXML} == 'ERROR' "))
 		                		.setHeader(Constant.CAUSE_ERROR).xpath("//description/text()")
-		                		.throwException(Exception.class,"${header.cause}")
+		                		.process(new BuildResponse())
+		                		.throwException(Exception.class,"${body}")
 		                	.endChoice()
 		                	.when(simple("${exchangeProperty.SAMResponseXML} == 'OK' "))
-		                		.setBody(constant("ok"))
+		                		.process(new BuildResponse())
 	                		.endChoice()
 	                		.otherwise()
 	                			.throwException(Exception.class,"Excepcion en el envìo del XML a SAM")

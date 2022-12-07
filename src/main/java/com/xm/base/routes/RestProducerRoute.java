@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import com.base.xm.process.BuildResponse;
 import com.xm.base.config.RestProducerConfig;
 import com.xm.base.constant.Constant;
 
@@ -33,6 +34,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .setBody(simple("Error de Comunicacion "))
                 .setHeader("CamelHttpResponseCode", simple("500"))
                 .wireTap("direct:send-amq-exception")
+                .process(new BuildResponse())
                 .end();
 
         onException(SocketTimeoutException.class )
@@ -43,6 +45,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .setBody(simple("Error de Comunicacion "))
                 .setHeader("CamelHttpResponseCode", simple("500"))
                 .wireTap("direct:send-amq-exception")
+                .process(new BuildResponse())
                 .end();
 
         onException(HttpOperationFailedException.class)
@@ -53,6 +56,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .setBody(simple("${exception.responseBody}"))
                 .setHeader("CamelHttpResponseCode", simple("${exception.statusCode}"))
                 .wireTap("direct:send-amq-exception")
+                .process(new BuildResponse())
                 .end();
 
         onException(UnknownHostException.class)
@@ -63,6 +67,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .setBody(simple("Host no reconocido"))
                 .setHeader("CamelHttpResponseCode", simple("500"))
                 .wireTap("direct:send-amq-exception")
+                .process(new BuildResponse())
                 .end();
 
         onException(Exception.class)
@@ -73,6 +78,7 @@ public class RestProducerRoute extends RouteBuilder {
                 .setBody(simple("Error Inesperado"))
                 .setHeader("CamelHttpResponseCode", simple("500"))
                 .wireTap("direct:send-amq-exception")
+                .process(new BuildResponse())
                 .end();
 
         from("direct:call-external-ws")
@@ -82,14 +88,14 @@ public class RestProducerRoute extends RouteBuilder {
                 .setHeader(Exchange.CONTENT_TYPE, constant(MediaType.TEXT_XML_VALUE))
                 .setHeader(Exchange.HTTP_URI, simple(restProducerConfig.getProtocol()+"://"
                         +restProducerConfig.getHost()+restProducerConfig.getContext()))
-                .setHeader(Constant.OPERATION_NAME, simple("${header.operationname}"))
-                .setHeader(Constant.OPERATION_NAME, simple("${header.fileid}"))
-                .setHeader(Constant.OPERATION_NAME, simple("${header.varname}"))
+                .setHeader(Constant.OPERATION_NAME, simple("{{rest.produces.operationname}}"))
+                .setHeader("FILE_ID", simple("${header.id_file}"))
+                .setHeader(Constant.VARIABLE_NAME, simple("${header.varname}"))
                 .to("velocity:templates/request.vm?loaderCache=false")
                 .to("direct:logRequestExternalService")
                 .to("http://call")
                 .convertBodyTo(String.class)
-                .to("direct:logResponseMS")
+                .to("direct:logResponseExternalService")
                 .end();
 
     }

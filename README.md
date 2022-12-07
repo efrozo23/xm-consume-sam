@@ -25,29 +25,28 @@ Se parametriza los datos para consumir el servicio
 Ejecución a través de CURL
 
     curl --location --request POST 'http://localhost:8082/sam/send_file' \
+	--header 'operationname: sendfile' \
+	--header 'id_file: 0000222000' \
+	--header 'varname: test' \
 	--header 'Content-Type: application/json' \
 	--data-raw '{
-    "payload": "file-encode-base-64"
+	    "payload": "ok"
 	}'
 
 Response 200
 
     {
-        "estado": "ok"
+        "estado": "OK"
     }
 
 Response 4XX
     
     {
-        "tipo": "TECNICO",
-        "codigo": "ERR-TRANSACTION-001",
-        "mensaje": "Ha ocurrido un error enviando el archivo"
-    }
+    	"estado": "ERROR GENERAL"
+	}
 
 Response 5XX
 
     {
-        "tipo": "TECNICO",
-        "codigo": "ERR-TRANSACTION-002",
-        "mensaje": "Ha ocurrido un error Inesperado"
-    }
+    	"estado": "ERROR GENERAL"
+	}

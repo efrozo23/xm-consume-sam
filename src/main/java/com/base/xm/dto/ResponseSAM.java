@@ -1,5 +1,8 @@
 package com.base.xm.dto;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+
+@JsonRootName("")
 public class ResponseSAM {
 
 	private String estado;

@@ -16,6 +16,7 @@
 
 
 	<root level="info">
+		<appender-ref ref="STDOUT" />
 		<appender-ref ref="RestAppender" />
 	</root>
 
